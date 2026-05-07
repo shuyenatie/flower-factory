@@ -11,6 +11,10 @@ const PORT = process.env.PORT || 3000
 app.use(cors())
 app.use(express.json())
 
+app.get('/', (req, res) => {
+  res.redirect('/api/hello')
+})
+
 app.get('/api/hello', async (req, res) => {
   try {
     let dbStatus = '未配置'
