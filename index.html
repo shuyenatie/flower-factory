@@ -3,6 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2c3a4a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="pwa-icon.svg">
 <title>手工花厂计件管理系统</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -125,5 +130,11 @@ h1 { font-size: 36px; font-weight: 700; color: #2c3a4a; }
 <div class="footer">
   <p>手工花厂计件管理系统 · 开源免费</p>
 </div>
+
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js')
+}
+</script>
 </body>
 </html>
