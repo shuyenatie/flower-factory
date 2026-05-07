@@ -1,7 +1,7 @@
 const TOKEN_KEY = 'flower_token'
 const PHONE_KEY = 'flower_phone'
 
-let baseUrl = 'http://localhost:3000'
+let baseUrl = 'https://flower-factory.onrender.com'
 
 export function setBaseUrl(url) {
   baseUrl = url
