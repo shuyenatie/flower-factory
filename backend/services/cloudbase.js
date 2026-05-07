@@ -106,7 +106,13 @@ async function count(collection, condition = '') {
   query += `.count()`
 
   const result = await request('databasequery', query)
-  const parsed = JSON.parse(result.data)
+  let parsed
+  try {
+    parsed = JSON.parse(result.data)
+  } catch (e) {
+    console.error('[cloudbase] count 解析失败:', result.data)
+    return 0
+  }
   return parsed[0] ? parsed[0].total : 0
 }
 
