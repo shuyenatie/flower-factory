@@ -12,7 +12,21 @@ app.use(cors())
 app.use(express.json())
 
 app.get('/', (req, res) => {
-  res.redirect('/api/hello')
+  res.json({
+    message: '手工花厂计件管理系统 API v1.0.0',
+    status: 'ok',
+    version: '1.0.0',
+    time: new Date().toISOString()
+  })
+})
+
+app.get('/api/status', (req, res) => {
+  res.json({
+    wxAppid: config.wxAppid || '未设置',
+    wxSecret: config.wxSecret ? '已设置' : '未设置',
+    cloudEnv: config.cloudEnv,
+    jwtSecret: config.jwtSecret ? '已设置' : '未设置'
+  })
 })
 
 app.get('/api/hello', async (req, res) => {
