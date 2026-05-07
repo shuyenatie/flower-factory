@@ -1,0 +1,107 @@
+<view class="page-wrap">
+  <scroll-view class="form-scroll" scroll-y>
+    <view class="form-section">
+      <text class="section-title">1. 单号</text>
+      <input class="field-input" placeholder="填写单号，如 188d-2" value="{{orderNo}}" bindinput="onOrderNoInput" bindblur="onOrderNoBlur" />
+      <text class="field-hint" wx:if="{{filteredProducts.length < allProducts.length}}">已按单号过滤花型，共 {{filteredProducts.length}} 个</text>
+    </view>
+
+    <view class="form-section">
+      <text class="section-title">2. 拿货商</text>
+      <view class="picker-btn disabled">
+        <text class="picker-text">{{clientName || '暂无拿货商'}}</text>
+      </view>
+    </view>
+
+    <view class="form-section">
+      <text class="section-title">3. 取材料日期</text>
+      <picker mode="date" value="{{orderDate}}" bindchange="onOrderDateChange">
+        <view class="picker-btn">
+          <text class="picker-text">{{orderDate}}</text>
+          <text class="picker-arrow">▼</text>
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-section">
+      <text class="section-title">4. 约定送回日期（可选）</text>
+      <picker mode="date" value="{{returnDate}}" bindchange="onReturnDateChange">
+        <view class="picker-btn">
+          <text class="picker-text {{returnDate ? '' : 'placeholder'}}">{{returnDate || '点击选择日期'}}</text>
+          <text class="picker-arrow">▼</text>
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-section">
+      <view class="section-header-row">
+        <text class="section-title">5. 加工花型</text>
+        <text class="add-product-btn" bindtap="addProductItem">+ 添加</text>
+      </view>
+      <view class="product-card" wx:for="{{productItems}}" wx:key="index" data-index="{{index}}">
+        <view class="product-top">
+          <text class="product-num">花型 {{index + 1}}</text>
+          <text class="product-remove" wx:if="{{productItems.length > 1}}" bindtap="removeProductItem" data-index="{{index}}">删除</text>
+        </view>
+
+        <view class="product-field">
+          <text class="field-label">选择花型</text>
+          <picker mode="selector" range="{{filteredDisplayNames}}" bindchange="onProductSelect" data-index="{{index}}">
+            <view class="picker-sm">
+              <text class="{{item.productId ? '' : 'placeholder'}}">{{item.displayName || '请选择花型'}}</text>
+              <text class="picker-arrow">▼</text>
+            </view>
+          </picker>
+        </view>
+
+        <view class="row-2col">
+          <view class="product-field">
+            <text class="field-label">每枝手数</text>
+            <input class="field-input-sm" type="number" placeholder="0" value="{{item.handsPerPiece}}" bindinput="onHandsPerPieceInput" data-index="{{index}}" />
+          </view>
+          <view class="product-field">
+            <text class="field-label">打数（12枝=1打）</text>
+            <input class="field-input-sm" type="number" placeholder="0" value="{{item.dozenCount}}" bindinput="onDozenCountInput" data-index="{{index}}" />
+          </view>
+        </view>
+
+        <view class="calc-divider" wx:if="{{item.dozenCount > 0}}"></view>
+        <view class="calc-row" wx:if="{{item.dozenCount > 0}}">
+          <text class="calc-label">枝数</text>
+          <text class="calc-val">{{item.pieceCount}}枝（{{item.dozenCount}}打）</text>
+        </view>
+        <view class="calc-row" wx:if="{{item.dozenCount > 0}}">
+          <text class="calc-label">箩数</text>
+          <text class="calc-val">{{item.basketCount}}箩</text>
+        </view>
+        <view class="calc-row" wx:if="{{item.dozenCount > 0}}">
+          <text class="calc-label">总手数</text>
+          <text class="calc-val">{{item.totalHandsText}}手</text>
+        </view>
+        <view class="calc-row" wx:if="{{item.dozenCount > 0}}">
+          <text class="calc-label">拿货价</text>
+          <text class="calc-val amount">¥{{item.amountText}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="form-section">
+      <text class="section-title">6. 拿货价总额</text>
+      <view class="total-row">
+        <text class="total-label">合计{{productItems.length}}个花型</text>
+        <text class="total-val">¥{{totalAmountText || '0.00'}}</text>
+      </view>
+    </view>
+
+    <view class="form-section">
+      <text class="section-title">7. 备注（可选）</text>
+      <input class="field-input" placeholder="填写备注信息" value="{{note}}" bindinput="onNoteInput" />
+    </view>
+
+    <view class="form-bottom"></view>
+  </scroll-view>
+
+  <view class="bottom-bar">
+    <view class="submit-btn" bindtap="saveOrder">保存加工单</view>
+  </view>
+</view>

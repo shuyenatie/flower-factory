@@ -1,0 +1,108 @@
+<view class="page-wrap">
+  <view class="date-header">
+    <picker mode="date" value="{{currentDate}}" bindchange="onDateChange">
+      <view class="date-picker">
+        <text class="date-text">{{displayDate}}</text>
+        <text class="date-arrow">▼</text>
+      </view>
+    </picker>
+  </view>
+
+  <scroll-view class="worker-grid" scroll-y>
+    <view class="grid-inner">
+      <view class="dashboard-card">
+        <view class="dashboard-title">
+          <text class="dashboard-month">{{currentDate.slice(0,7)}} 汇总</text>
+          <text class="dashboard-link" bindtap="goMine">查看详情 ›</text>
+        </view>
+        <view class="dashboard-stats">
+          <view class="stat-item">
+            <text class="stat-num">{{summaryWorkerCount}}</text>
+            <text class="stat-label">计件人数</text>
+          </view>
+          <view class="stat-item">
+            <text class="stat-num">{{summaryTotalQty}}</text>
+            <text class="stat-label">总件数</text>
+          </view>
+          <view class="stat-item">
+            <text class="stat-num">{{summaryDayCount}}</text>
+            <text class="stat-label">开工天数</text>
+          </view>
+        </view>
+        <view class="dashboard-amount">
+          <text class="amount-label">应发总额</text>
+          <text class="amount-value">¥{{summaryTotalAmount}}</text>
+        </view>
+      </view>
+
+      <view class="section-header">
+        <text>选择工人（{{workers.length}}人）</text>
+      </view>
+      <view class="search-bar">
+        <input class="search-input" placeholder="搜索姓名" value="{{searchText}}" bindinput="onSearchInput" />
+      </view>
+      <view class="grid-2col">
+        <view class="worker-btn" wx:for="{{filteredWorkers}}" wx:key="_id"
+              bindtap="selectWorker" data-item="{{item}}">
+          <text class="worker-name">{{item.name}}</text>
+        </view>
+      </view>
+
+    <view class="empty-tip" wx:if="{{workersEmpty}}">
+      <text>暂无在职工人\n请先到下方「工人管理」添加</text>
+    </view>
+    </view>
+  </scroll-view>
+
+  <view class="manage-bar">
+    <view class="manage-link" bindtap="goWorkers">工人管理</view>
+    <view class="manage-link" bindtap="goProducts">花型管理</view>
+    <view class="manage-link" bindtap="goClients">客户管理</view>
+    <view class="manage-link" bindtap="goOrders">加工单</view>
+  </view>
+
+  <view class="sheet-overlay {{showSheet ? 'show' : ''}}" bindtap="closeSheet">
+    <view class="sheet-container {{showSheet ? 'show' : ''}}" catchtap="stopPropagation">
+      <view class="sheet-handle"></view>
+      <view class="sheet-header">
+        <text class="sheet-worker-name">{{selectedWorker ? selectedWorker.name : ''}}</text>
+        <text class="sheet-close" bindtap="closeSheet">关闭</text>
+      </view>
+
+      <view class="sheet-body">
+        <view class="sheet-tip">选择花型</view>
+        <view class="product-search">
+          <input class="product-search-input" placeholder="搜索花型名称或型号" value="{{productSearchText}}" bindinput="onProductSearchInput" />
+        </view>
+        <view class="grid-2col">
+          <view class="product-card {{selectedProduct && selectedProduct._id == item._id ? 'active' : ''}}"
+                wx:for="{{filteredProducts}}" wx:key="_id" bindtap="selectProduct" data-item="{{item}}">
+            <text class="product-name">{{item.modelNo ? item.modelNo + '-' + item.name : item.name}}</text>
+            <text class="product-price">{{item.price}}元/件</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="sheet-qty" wx:if="{{!noProductSelected}}">
+        <text class="qty-title">{{selectedProduct.name}} · 输入数量</text>
+        <view class="qty-quick">
+          <view class="qty-btn" wx:for="{{[50,100,200,500]}}" wx:key=""
+                bindtap="setQuantity" data-val="{{item}}">{{item}}</view>
+        </view>
+        <view class="qty-input-row">
+          <text class="qty-label">数量</text>
+          <input class="qty-input" type="number" value="{{quantity}}"
+                 placeholder="0" bindinput="onQuantityInput"
+                 focus="{{autoFocus}}" />
+          <text class="qty-unit">件</text>
+        </view>
+        <view class="qty-preview" wx:if="{{previewText}}">
+          <text>{{previewText}}</text>
+        </view>
+        <button class="submit-btn"
+                disabled="{{!canSubmit}}"
+                bindtap="submitRecord">确认添加</button>
+      </view>
+    </view>
+  </view>
+</view>

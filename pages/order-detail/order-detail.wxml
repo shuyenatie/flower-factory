@@ -1,0 +1,161 @@
+<view class="page-wrap" wx:if="{{order}}">
+  <scroll-view class="detail-scroll" scroll-y>
+    <view class="info-card">
+      <view class="info-top">
+        <text class="info-name">{{order.clientName}}</text>
+        <text class="info-status {{order.status}}">{{order.status === 'pending' ? '进行中' : '已完成'}}</text>
+      </view>
+      <view class="info-row" wx:if="{{order.orderNo}}">
+        <text class="info-label">单号</text>
+        <text class="info-val">{{order.orderNo}}</text>
+      </view>
+      <view class="info-row" bindtap="goClientDetail">
+        <text class="info-label">拿货商</text>
+        <text class="info-val link">{{order.clientName}} 详情</text>
+      </view>
+      <view class="info-row">
+        <text class="info-label">取材料日期</text>
+        <text class="info-val">{{order.orderDate}}</text>
+      </view>
+      <view class="info-row" wx:if="{{order.returnDate}}">
+        <text class="info-label">约定送回</text>
+        <text class="info-val">{{order.returnDate}}</text>
+      </view>
+      <view class="info-row" wx:if="{{order.actualReturnDate}}">
+        <text class="info-label">实际送回</text>
+        <text class="info-val">{{order.actualReturnDate}}</text>
+      </view>
+      <view class="info-row" wx:if="{{order.processingFee}}">
+        <text class="info-label">加工费总额</text>
+        <text class="info-val fee">¥{{order.processingFee}}</text>
+      </view>
+      <view class="info-row" wx:if="{{order.note}}">
+        <text class="info-label">备注</text>
+        <text class="info-val">{{order.note}}</text>
+      </view>
+    </view>
+
+    <view class="section-card">
+      <text class="section-title">花型列表</text>
+      <view class="product-row" wx:for="{{order.productList}}" wx:key="productId">
+        <view class="product-top-row">
+          <text class="product-name">{{item.displayName || item.productName}}</text>
+          <text class="product-amount" wx:if="{{item.amount > 0}}">¥{{item.amountText}}</text>
+        </view>
+        <view class="product-tags" wx:if="{{item.handsPerPiece || item.dozenCount}}">
+          <text class="product-tag" wx:if="{{item.handsPerPiece}}">{{item.handsPerPiece}}手/枝</text>
+          <text class="product-tag" wx:if="{{item.dozenCount}}">{{item.dozenCount}}打</text>
+          <text class="product-tag" wx:if="{{item.pieceCount}}">{{item.pieceCount}}枝</text>
+        </view>
+        <text class="product-formula" wx:if="{{item.formulaText}}">{{item.formulaText}}</text>
+        <text class="product-formula old" wx:else>{{item.quantity}}件 × {{item.unitPrice}}元</text>
+      </view>
+    </view>
+
+    <view class="section-card">
+      <view class="section-header-row">
+        <text class="section-title">关联计件记录（{{linkedRecords.length}}条）</text>
+        <text class="section-action" wx:if="{{order.status === 'pending'}}" bindtap="openLinkSheet">关联</text>
+      </view>
+      <view class="record-item" wx:for="{{linkedRecords}}" wx:key="_id">
+        <view class="record-top">
+          <text class="record-worker">{{item.workerName}}</text>
+          <text class="record-date">{{item.date}}</text>
+        </view>
+        <text class="record-detail">{{item.productName}} x {{item.quantity}}件 = {{item.chargeText}}</text>
+      </view>
+      <view class="empty-tip" wx:if="{{linkedRecords.length === 0}}">
+        <text>暂未关联计件记录</text>
+      </view>
+    </view>
+
+    <view class="profit-card" wx:if="{{order.productList && order.productList.length > 0}}">
+      <text class="profit-title">利润估算</text>
+      <view class="profit-row">
+        <text class="profit-label">加工费收入</text>
+        <text class="profit-val income">¥{{profitIncome.toFixed(1)}}</text>
+      </view>
+      <view class="profit-row">
+        <text class="profit-label">工人工资成本</text>
+        <text class="profit-val cost">¥{{profitCost.toFixed(1)}}</text>
+      </view>
+      <view class="profit-row profit-total">
+        <text class="profit-label">利润</text>
+        <text class="profit-val {{profitAmount >= 0 ? 'profit' : 'loss'}}">
+          {{profitAmount >= 0 ? '+' : ''}}¥{{profitAmount.toFixed(1)}}
+        </text>
+      </view>
+      <text class="profit-note">加工费优先取已填的总额，未填则按数量×拿货价计算。</text>
+    </view>
+
+    <view class="bottom-spacer"></view>
+  </scroll-view>
+
+  <view class="bottom-bar">
+    <view class="bottom-btn primary" wx:if="{{order.status === 'pending'}}" bindtap="openCompleteForm">标记为已完成</view>
+    <view class="bottom-btn danger" bindtap="showDeleteConfirm">删除订单</view>
+  </view>
+
+  <view class="form-overlay {{showCompleteForm ? 'show' : ''}}" bindtap="closeCompleteForm">
+    <view class="form-sheet {{showCompleteForm ? 'show' : ''}}" catchtap="stopPropagation">
+      <view class="form-header">
+        <text class="form-title">标记完成</text>
+        <text class="form-close" bindtap="closeCompleteForm">取消</text>
+      </view>
+      <view class="form-body">
+        <view class="field-row">
+          <text class="field-label">实际送回日期</text>
+          <picker mode="date" value="{{actualReturnDate}}" bindchange="onActualReturnDateChange">
+            <view class="picker-display">{{actualReturnDate}}</view>
+          </picker>
+        </view>
+        <view class="field-row">
+          <text class="field-label">加工费总额</text>
+          <input class="field-input" type="digit" placeholder="0.00" value="{{processingFee}}" bindinput="onFeeInput" />
+        </view>
+        <view class="submit-btn" bindtap="markCompleted">确认完成</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="overlay {{showLinkSheet ? 'show' : ''}}" bindtap="closeLinkSheet">
+    <view class="link-sheet {{showLinkSheet ? 'show' : ''}}" catchtap="stopPropagation">
+      <view class="link-header">
+        <text class="link-title">关联计件记录</text>
+        <text class="link-close" bindtap="closeLinkSheet">取消</text>
+      </view>
+      <view class="link-body">
+        <text class="link-hint">选择该批次时间内、同花型的计件记录进行关联</text>
+        <view class="link-item" wx:for="{{allRecords}}" wx:key="_id" bindtap="toggleRecordSelect" data-id="{{item._id}}">
+          <view class="link-check {{item.isSelected ? 'checked' : ''}}">
+            <text wx:if="{{item.isSelected}}">✓</text>
+          </view>
+          <view class="link-content">
+            <view class="link-top">
+              <text class="link-worker">{{item.workerName}}</text>
+              <text class="link-date">{{item.date}}</text>
+            </view>
+            <text class="link-detail">{{item.productName}} x {{item.quantity}}件 = {{item.chargeText}}</text>
+          </view>
+        </view>
+        <view class="empty-tip" wx:if="{{allRecords.length === 0}}">
+          <text>无可关联的记录</text>
+        </view>
+      </view>
+      <view class="link-bottom">
+        <view class="link-btn" bindtap="saveLinkRecords">关联所选（{{selectedRecordIds.length}}条）</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="confirm-overlay {{showDeleteConfirm ? 'show' : ''}}" bindtap="cancelDelete">
+    <view class="confirm-dialog" catchtap="stopPropagation">
+      <text class="confirm-title">删除订单</text>
+      <text class="confirm-desc">确定删除该加工单？关联的计件记录不受影响，仅删除订单本身。</text>
+      <view class="confirm-actions">
+        <view class="confirm-btn cancel" bindtap="cancelDelete">取消</view>
+        <view class="confirm-btn danger" bindtap="doDelete">确认删除</view>
+      </view>
+    </view>
+  </view>
+</view>

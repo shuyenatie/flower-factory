@@ -1,0 +1,119 @@
+<view class="page-wrap">
+  <view class="month-header">
+    <view class="month-pickers">
+      <view class="picker-group">
+        <picker mode="selector" range="{{yearRange}}" bindchange="onYearChange" value="{{yearIndex}}">
+          <text class="month-year">{{year}}年</text>
+        </picker>
+      </view>
+      <view class="picker-group">
+        <picker mode="selector" range="{{monthRange}}" bindchange="onMonthChange" value="{{monthIndex}}">
+          <text class="month-text">{{month}}月</text>
+        </picker>
+      </view>
+    </view>
+    <view class="month-nav-row">
+      <view class="month-nav" bindtap="prevMonth">◀ 上月</view>
+      <view class="month-nav" bindtap="nextMonth">下月 ▶</view>
+    </view>
+  </view>
+
+  <view class="top-links">
+    <view class="top-link" bindtap="goWorkers">工人管理</view>
+    <text class="link-divider">|</text>
+    <view class="top-link" bindtap="goProducts">花型管理</view>
+  </view>
+
+  <view class="summary-bar">
+    <text class="summary-label">月度合计</text>
+    <text class="summary-amount">{{totalAmount}} 元</text>
+  </view>
+
+  <scroll-view class="summary-list" scroll-y>
+    <view class="list-inner">
+      <view class="search-bar">
+        <input class="search-input" placeholder="搜索工人姓名" value="{{searchText}}" bindinput="onSearchInput" />
+      </view>
+      <view class="worker-card" wx:for="{{filteredWorkerData}}" wx:key="workerId" bindtap="toggleExpand" data-id="{{item.workerId}}">
+      <view class="worker-summary">
+          <view class="worker-left">
+            <text class="worker-name">{{item.workerName}}</text>
+            <text class="worker-qty">{{item.totalQuantity}}件</text>
+          </view>
+          <view class="worker-right">
+            <text class="worker-amount">{{item.amountText}}</text>
+            <text class="expand-icon">{{item.expanded ? '▲' : '▼'}}</text>
+          </view>
+        </view>
+
+        <view class="detail-list" wx:if="{{item.expanded}}">
+          <view class="detail-item" wx:for="{{item.records}}" wx:key="_id"
+                bindtap="editRecord" data-item="{{item}}">
+            <text class="detail-product">{{item.productName}}</text>
+            <text class="detail-qty">{{item.quantity}}件 × {{item.price}}元</text>
+            <text class="detail-amount">{{item.amountText}}</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="empty-tip" wx:if="{{!hasData}}">
+        <text>该月没有记录</text>
+      </view>
+    </view>
+  </scroll-view>
+
+  <view class="bottom-bar">
+    <button class="bottom-btn" bindtap="copySummary" disabled="{{!hasData}}">
+      复制工资汇总
+    </button>
+    <button class="bottom-btn export-btn" bindtap="exportExcel" disabled="{{!hasData}}">
+      导出 Excel
+    </button>
+  </view>
+
+  <view class="manage-bar">
+    <view class="manage-link" bindtap="goIncome">收入管理</view>
+    <view class="manage-link" bindtap="goExpense">支出管理</view>
+    <view class="manage-link" bindtap="goClients">客户管理</view>
+    <view class="manage-link" bindtap="goOrders">加工单</view>
+  </view>
+
+  <view class="edit-overlay {{showEditSheet ? 'show' : ''}}" bindtap="closeEditSheet">
+    <view class="edit-sheet {{showEditSheet ? 'show' : ''}}" catchtap="stopPropagation">
+      <view class="edit-header">
+        <text class="edit-title">修改记录</text>
+        <text class="edit-close" bindtap="closeEditSheet">取消</text>
+      </view>
+      <view class="edit-body">
+        <view class="edit-worker-row">
+          <text class="edit-worker-name">{{editWorkerName}}</text>
+        </view>
+        <view class="sheet-tip">选择花型</view>
+        <view class="grid-2col">
+          <view class="product-card {{editProduct && editProduct._id == item._id ? 'active' : ''}}"
+                wx:for="{{products}}" wx:key="_id" bindtap="selectEditProduct" data-item="{{item}}">
+            <text class="product-name">{{item.name}}</text>
+            <text class="product-price">{{item.price}}元/件</text>
+          </view>
+        </view>
+      </view>
+      <view class="edit-qty" wx:if="{{editProduct}}">
+        <text class="qty-title">{{editProduct.name}} · 修改数量</text>
+        <view class="qty-quick">
+          <view class="qty-btn" wx:for="{{[50,100,200,500]}}" wx:key=""
+                bindtap="setEditQuantity" data-val="{{item}}">{{item}}</view>
+        </view>
+        <view class="qty-input-row">
+          <text class="qty-label">数量</text>
+          <input class="qty-input" type="number" value="{{editQuantity}}"
+                 placeholder="0" bindinput="onEditQuantityInput" />
+          <text class="qty-unit">件</text>
+        </view>
+        <view class="qty-preview" wx:if="{{editPreview}}">
+          <text>{{editPreview}}</text>
+        </view>
+        <view class="submit-btn" bindtap="saveEdit">保存修改</view>
+      </view>
+    </view>
+  </view>
+</view>
