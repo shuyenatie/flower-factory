@@ -1,0 +1,71 @@
+<view class="page-wrap">
+  <view class="summary-bar">
+    <text class="summary-label">本月收入合计</text>
+    <text class="summary-amount">¥{{monthTotal}}</text>
+  </view>
+
+  <scroll-view class="list-scroll" scroll-y>
+    <view class="list-inner">
+      <view class="income-card" wx:for="{{list}}" wx:key="_id" data-item="{{item}}" bindtap="showEditForm">
+        <view class="card-top-row">
+          <text class="card-date">{{item.date}}</text>
+          <text class="card-amount">¥{{item.amountText}}</text>
+        </view>
+        <view class="card-row">
+          <text class="card-label">拿货商</text>
+          <text class="card-value">{{item.clientName}}</text>
+        </view>
+        <view class="card-row" wx:if="{{item.orderNo}}">
+          <text class="card-label">单号</text>
+          <text class="card-value order-no">{{item.orderNo}}</text>
+        </view>
+        <view class="card-row card-note-row" wx:if="{{item.note}}">
+          <text class="card-label">备注</text>
+          <text class="card-value note-text">{{item.note}}</text>
+        </view>
+        <view class="card-del" bindtap="deleteRecord" data-id="{{item._id}}" catchtap>删除</view>
+      </view>
+
+      <view class="empty-tip" wx:if="{{list.length === 0 && !loading}}">
+        <text>暂无收入记录</text>
+        <text class="empty-sub">点击下方按钮添加</text>
+      </view>
+
+      <view class="loading-tip" wx:if="{{loading}}">
+        <text>加载中...</text>
+      </view>
+    </view>
+  </scroll-view>
+
+  <view class="bottom-bar">
+    <button class="add-btn" bindtap="showAddForm">+ 添 加 收 入</button>
+  </view>
+
+  <view class="modal-overlay" wx:if="{{showForm}}" bindtap="hideAddForm">
+    <view class="modal-content" catchtap="noop">
+      <text class="modal-title">{{editingId ? '编辑收入' : '添加收入'}}</text>
+
+      <text class="form-label">拿货商</text>
+      <text class="form-static">{{form.clientName}}</text>
+
+      <text class="form-label form-label-opt">单号（选填）</text>
+      <input class="form-input" placeholder="如 188d-2" value="{{form.orderNo}}" bindinput="onFormInput" data-field="orderNo" />
+
+      <text class="form-label">金额（元）</text>
+      <input class="form-input" placeholder="0.00" type="digit" value="{{form.amount}}" bindinput="onFormInput" data-field="amount" />
+
+      <text class="form-label">日期</text>
+      <picker mode="date" value="{{form.date}}" bindchange="onFormDate">
+        <view class="form-picker">{{form.date}}</view>
+      </picker>
+
+      <text class="form-label form-label-opt">备注（选填）</text>
+      <input class="form-input" placeholder="输入备注" value="{{form.note}}" bindinput="onFormInput" data-field="note" />
+
+      <view class="modal-actions">
+        <view class="action-btn action-cancel" bindtap="hideAddForm">取消</view>
+        <view class="action-btn action-confirm" bindtap="saveIncome">{{editingId ? '保存修改' : '保存'}}</view>
+      </view>
+    </view>
+  </view>
+</view>

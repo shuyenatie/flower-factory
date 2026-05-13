@@ -1,0 +1,40 @@
+wing: "\u624B\u5DE5\u82B1\u5C0F\u7A0B\u5E8F"
+rooms:
+- name: app
+  description: Files from app/
+  keywords:
+  - app
+  - app
+- name: backend
+  description: Files from backend/
+  keywords:
+  - backend
+  - backend
+- name: cloudfunctions
+  description: Files from cloudfunctions/
+  keywords:
+  - cloudfunctions
+  - cloudfunctions
+- name: images
+  description: Files from images/
+  keywords:
+  - images
+  - images
+- name: frontend
+  description: Files from pages/
+  keywords:
+  - frontend
+  - pages
+- name: scripts
+  description: Files from utils/
+  keywords:
+  - scripts
+  - utils
+- name: configuration
+  description: Files from config/
+  keywords:
+  - configuration
+  - config
+- name: general
+  description: Files that don't fit other rooms
+  keywords: []
